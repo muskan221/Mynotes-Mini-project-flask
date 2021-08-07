@@ -1,11 +1,27 @@
 from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 
-app=Flask(__name__)
+db_user = "root"
+db_pass = "muskan&"
+db_name = "my_notes"
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://{}:{}@localhost/{}".format(db_user, db_pass, db_name)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    notes_sql = "Select * from notes"
+    notes = db.session.execute(notes_sql)
+    # print(type(notes))
+    # for note in notes:
+    #      print(note)
+    return render_template('index.html', notes = notes)
 
-
+@app.route("/create")
+def create():
+    return render_template("create.html")
 if __name__ == "__main__":
     app.run(debug=True)
